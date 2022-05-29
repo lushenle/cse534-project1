@@ -2,7 +2,7 @@
 version: "3.8"
 services:
   gateway:
-    image: ishenle/ubuntu:18.04
+    image: ishenle/ubuntu:18.04-arm64
     container_name: gateway
     restart: on-failure
     # command: ["sleep","infinity"]
@@ -15,13 +15,15 @@ services:
       - net.ipv4.conf.default.rp_filter=0
       - net.ipv4.conf.all.rp_filter=0
     networks:
+      front:
+        ipv4_address: 172.16.0.2
       server:
         ipv4_address: 10.0.0.100
       client:
         ipv4_address: 192.168.0.100
 
   server:
-    image: ishenle/ubuntu:18.04
+    image: ishenle/ubuntu:18.04-arm64
     container_name: server
     restart: on-failure
     command: ["/usr/bin/tail", "-f", "/etc/hosts"]
@@ -35,7 +37,7 @@ services:
       - gateway
 
   client:
-    image: ishenle/ubuntu:18.04
+    image: ishenle/ubuntu:18.04-arm64
     container_name: client
     restart: on-failure
     command: ["/usr/bin/tail", "-f", "/etc/hosts"]
@@ -52,6 +54,13 @@ networks:
   front:
     driver: bridge
     enable_ipv6: false
+    driver_opts:
+      com.docker.network.bridge.enable_icc: "true"
+      com.docker.network.bridge.enable_ip_masquerade: "true"
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.16.0.0/24
 
   server:
     driver: macvlan

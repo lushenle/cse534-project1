@@ -11,8 +11,11 @@ LABEL "maintainer"="Shenle Lu <lushenle@gmail.com>" \
 
 # Install some tools, such as ping, ip, ifconfig, etc, ...
 RUN apt update && \
-    apt install -y --no-install-recommends iputils-ping net-tools dnsutils iproute2 && \
+    apt install -y --no-install-recommends iputils-ping net-tools dnsutils iproute2 iptables && \
     apt clean
+
+# Add the script for set ip_masq
+ADD ip_masq.sh /
 
 ENTRYPOINT ["/usr/bin/tail", "-f", "/etc/hosts"]
 CMD ["$@"]

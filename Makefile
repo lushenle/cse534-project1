@@ -16,6 +16,7 @@ build:
 deploy:
 	docker-compose -p project1 up -d
 	sleep 3
+	docker exec gateway /ip_masq.sh
 	@for container in $(containers); do \
 		docker exec $$container ip route del default; \
 		if [ $$container = "server" ]; then \
