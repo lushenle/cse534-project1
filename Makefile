@@ -6,12 +6,24 @@ SHELL := /bin/bash
 .ONESHELL:
 containers=server client
 
-.PHONY: all build deploy test down clean
+.PHONY: all arch build deploy test down clean
 
-all: build deploy test down clean
+OSFLAG 	:=
+UNAME_P := $(shell uname -p)
+ifeq ($(UNAME_P),x86_64)
+	OSFLAG = amd64
+endif
+ifneq ($(filter arm%,$(UNAME_P)),)
+	OSFLAG = arm
+endif
+
+all: arch build deploy test down clean
+
+arch:
+	@echo OSARCH=$(OSFLAG) > .env
 
 build:
-	docker build --no-cache -t ishenle/ubuntu:18.04 .
+	docker build -t ishenle/ubuntu:18.04-$(OSFLAG) .
 
 deploy:
 	docker-compose -p project1 up -d
