@@ -6,7 +6,7 @@ SHELL := /bin/bash
 .ONESHELL:
 containers=server client
 
-.PHONY: all arch build deploy test test1 down clean
+.PHONY: all arch build deploy show_net test test1 down clean
 
 OSFLAG 	:=
 UNAME_P := $(shell uname -p)
@@ -17,7 +17,7 @@ ifneq ($(filter arm%,$(UNAME_P)),)
 	OSFLAG = arm64
 endif
 
-all: arch build deploy test test1 down clean
+all: arch build deploy show_net test test1 down clean
 
 arch:
 	@echo OSARCH=$(OSFLAG) > .env
@@ -38,6 +38,16 @@ deploy:
 	  	fi \
 	done
 
+show_net:
+	@for container in gateway server client; do \
+  		 echo "Show $$container net info:" ; \
+  		 echo "" ; \
+         docker exec $$container ip a ; \
+         echo "" ; \
+         docker exec $$container ip route show ; \
+         echo "" ; \
+    done
+
 test:
 	@for container in $(containers); do \
     		if [ $$container = "server" ]; then \
@@ -56,8 +66,8 @@ test:
 
 test1:
 	@for container in gateway server client; do \
-  		 echo "From $$container ping shenle.lu" ; \
-         docker exec $$container ping -c 1 -w 2 shenle.lu ; \
+  		 echo "From $$container curl shenle.lu" ; \
+         docker exec $$container curl -sL -k -I https://shenle.lu ; \
     done
 
 down:
