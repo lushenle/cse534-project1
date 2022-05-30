@@ -2,7 +2,7 @@
 version: "3.8"
 services:
   gateway:
-    image: ishenle/ubuntu:18.04-arm64
+    image: ishenle/ubuntu:18.04-${OSARCH}
     container_name: gateway
     restart: on-failure
     # command: ["sleep","infinity"]
@@ -23,7 +23,7 @@ services:
         ipv4_address: 192.168.0.100
 
   server:
-    image: ishenle/ubuntu:18.04-arm64
+    image: ishenle/ubuntu:18.04-${OSARCH}
     container_name: server
     restart: on-failure
     command: ["/usr/bin/tail", "-f", "/etc/hosts"]
@@ -37,7 +37,7 @@ services:
       - gateway
 
   client:
-    image: ishenle/ubuntu:18.04-arm64
+    image: ishenle/ubuntu:18.04-${OSARCH}
     container_name: client
     restart: on-failure
     command: ["/usr/bin/tail", "-f", "/etc/hosts"]
