@@ -6,7 +6,7 @@ SHELL := /bin/bash
 .ONESHELL:
 containers=server client
 
-.PHONY: all arch build deploy test down clean
+.PHONY: all arch build deploy test test1 down clean
 
 OSFLAG 	:=
 UNAME_P := $(shell uname -p)
@@ -14,10 +14,10 @@ ifeq ($(UNAME_P),x86_64)
 	OSFLAG = amd64
 endif
 ifneq ($(filter arm%,$(UNAME_P)),)
-	OSFLAG = arm
+	OSFLAG = arm64
 endif
 
-all: arch build deploy test down clean
+all: arch build deploy test test1 down clean
 
 arch:
 	@echo OSARCH=$(OSFLAG) > .env
@@ -54,8 +54,14 @@ test:
     	  	fi \
     	done
 
+test1:
+	@for container in gateway server client; do \
+  		 echo "From $$container ping shenle.lu" ; \
+         docker exec $$container ping -c 1 -w 2 shenle.lu ; \
+    done
+
 down:
 	docker-compose -p project1 down -v
 
 clean:
-	docker rmi ishenle/ubuntu:18.04
+	docker rmi ishenle/ubuntu:18.04-$(OSFLAG)
